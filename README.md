@@ -1,2 +1,2 @@
-# CJK-Script-AI
- Generate new Chinese, Japanese, Korean (CJK) characters 
+# Radical Match AI
+ Generate (and match) radicals most likely associated with Chinese and Japanese characters.
