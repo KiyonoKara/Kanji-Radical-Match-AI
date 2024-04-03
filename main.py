@@ -33,6 +33,17 @@ def create_eng_to_rads(char_to_rads, eng_to_chars):
     # TODO: use the character to radical dictionary and english to
     # character dictionary to construct the english to radical dictionary
 
+    for eng_word in eng_to_chars:
+
+        # create new dict entry for eng word
+        eng_to_rads[eng_word] = []
+        for char in eng_to_chars[eng_word]:
+
+            # add unique radicals to eng word entry
+            if char in char_to_rads:
+                for rad in char_to_rads[char]:
+                    if (rad not in eng_to_rads[eng_word]):
+                        eng_to_rads[eng_word].append(rad)
     return eng_to_rads
 
 def load_json_dict(filename):
