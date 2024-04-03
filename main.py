@@ -26,7 +26,7 @@ def train_word(word_vec, true_lbl):
     return
 
 def save_model(model, filename):
-    torch.save()
+    torch.save(model, filename)
 
 def create_eng_to_rads(char_to_rads, eng_to_chars):
     eng_to_rads = dict()
