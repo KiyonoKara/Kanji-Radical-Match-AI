@@ -7,6 +7,8 @@ CHAR_TO_RAD_DIRECTORY = f"{DATA_DIRECTORY_NAME}/{CHAR_TO_RAD_FILENAME}"
 ENG_TO_CHARS_FILENAME = "eng_to_chars.json"
 ENG_TO_CHARS_DIRECTORY = f"{DATA_DIRECTORY_NAME}/{ENG_TO_CHARS_FILENAME}"
 
+# model is a list of np vectors
+
 def run_model(word, model):
     # throw word in model to see the radical vector
     radical_vect = []
@@ -23,7 +25,8 @@ def train_word(word_vec, true_lbl):
 
 def save_model(model, filename):
     output_directory = f"{DATA_DIRECTORY_NAME}/{filename}"
-    # save model
+    with open(output_directory, "w") as file:
+        pass
     return
 
 def create_eng_to_rads(char_to_rads, eng_to_chars):
