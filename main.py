@@ -1,5 +1,6 @@
 import json
 import numpy as np
+import torch
 
 DATA_DIRECTORY_NAME = "data"
 CHAR_TO_RAD_FILENAME = "char_to_rad.json"
@@ -24,10 +25,7 @@ def train_word(word_vec, true_lbl):
     return
 
 def save_model(model, filename):
-    output_directory = f"{DATA_DIRECTORY_NAME}/{filename}"
-    with open(output_directory, "w") as file:
-        pass
-    return
+    torch.save()
 
 def create_eng_to_rads(char_to_rads, eng_to_chars):
     eng_to_rads = dict()
