@@ -47,7 +47,7 @@ def load_eng_to_rads():
     return eng_to_rads
 
 def main():
-    eng_to_rads = load_eng_to_rads()
+    # put in whatever you want to here for debugging locally
 
 if __name__ == "__main__":
     main()
