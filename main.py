@@ -31,7 +31,7 @@ def save_model(model, filename):
 def create_eng_to_rads(char_to_rads, eng_to_chars):
     eng_to_rads = dict()
 
-    # TODO: use the character to radical dictionary and english to
+    # use the character to radical dictionary and english to
     # character dictionary to construct the english to radical dictionary
 
     for eng_word in eng_to_chars:
