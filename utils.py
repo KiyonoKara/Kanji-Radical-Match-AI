@@ -1,6 +1,8 @@
 import json
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import torch.optim as optim
 
 DATA_DIRECTORY_NAME = "data"
 CHAR_TO_RAD_FILENAME = "kanji_to_radical.json"
@@ -54,6 +56,39 @@ def load_eng_to_rads() -> dict[str, list[str]]:
     return eng_to_rads
 
 
+def train_model(model: nn.Module,
+                eng_tensor: torch.Tensor,
+                rad_tensor: torch.Tensor,
+                optimizer: optim.Optimizer,
+                criterion=nn.MSELoss(),
+                epochs=100,
+                verbose=False):
+    """
+    Trains the model based on all of its information and parameters
+    :param model:
+    :param eng_tensor:
+    :param rad_tensor:
+    :param optimizer:
+    :param criterion:
+    :param epochs:
+    :param verbose: Whether to print the loss during training
+    :return:
+    """
+
+    for i in range(0, epochs):
+        for eng, rad in zip(eng_tensor, rad_tensor):
+            # Zero the gradient buffers
+            optimizer.zero_grad()
+            output = model(eng)
+            # Large
+            loss = criterion(rad, output)
+            loss.backward()
+            # Update
+            optimizer.step()
+            if verbose:
+                print("Epoch {: >8} Loss: {}".format(i, loss.data.numpy()))
+
+
 class KanjiFFNN(nn.Module):
     def __init__(self, eng_vocab_size: int, radical_vocab_size: int, nodes: int):
         super(KanjiFFNN, self).__init__()
@@ -63,6 +98,11 @@ class KanjiFFNN(nn.Module):
         self.out1 = nn.Linear(nodes, radical_vocab_size)
 
     def forward(self, x):
+        """
+        Forward propagation of the model
+        :param x: Data
+        :return:
+        """
         # Pass input x to hidden layer
         x = self.hid1(x)
         # Apply ReLU activation function to output of first layer
@@ -72,4 +112,3 @@ class KanjiFFNN(nn.Module):
         # Apply sigmoid to output
         x = F.sigmoid(x)
         return x
-
