@@ -11,10 +11,11 @@ CHAR_TO_RAD_DIRECTORY = f"{DATA_DIRECTORY_NAME}/{CHAR_TO_RAD_FILENAME}"
 ENG_TO_CHARS_FILENAME = "english_to_kanji.json"
 ENG_TO_CHARS_DIRECTORY = f"{DATA_DIRECTORY_NAME}/{ENG_TO_CHARS_FILENAME}"
 
+# converted dictionary to pandas data frame so we can easily read the json
 def reformat_data():
     eng_to_chars_data = pd.read_json(ENG_TO_CHARS_DIRECTORY)
 
-    # add a new column to the data
+    # add a new column to the data frame and switched column ordering
     eng_to_chars_data["English"] = eng_to_chars_data.index
     eng_to_chars_data.columns = ["Kanji", "English"]
     eng_to_chars_data = eng_to_chars_data[["English", "Kanji"]]
@@ -24,7 +25,8 @@ def reformat_data():
         eng_to_chars_data = eng_to_chars_data.explode("Kanji")
     return eng_to_chars_data
 
-# encodes the data and labels from strings to randomly assigned numbers
+# encodes the data and labels from strings to randomly assigned numbers so they can be tensorized
+# then convert data and labels to tensors
 def preprocess_data(data):
     encoder = preprocessing.LabelEncoder()
     encoded_data = encoder.fit_transform(data["English"])
@@ -78,9 +80,6 @@ def load_eng_to_rads():
     return eng_to_rads
 
 def main():
-    data = reformat_data()
-    print(data["English"].nunique())
-    print(data.describe())
     return
     # put in whatever you want to here for debugging locally
 
