@@ -70,5 +70,6 @@ class TestStringMethods(unittest.TestCase):
         eng_to_radicals = utils.create_eng_to_rads(kanji_to_rad_dict, e2k_sampled_dict)
         self.assertTrue(len(eng_to_radicals) == len(e2k_sampled_dict))
 
+
 if __name__ == '__main__':
     unittest.main()
