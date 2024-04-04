@@ -12,8 +12,12 @@ ENG_TO_CHARS_FILENAME = "english_to_kanji.json"
 ENG_TO_CHARS_DIRECTORY = f"{DATA_DIRECTORY_NAME}/{ENG_TO_CHARS_FILENAME}"
 
 
-# converted dictionary to pandas data frame so we can easily read the json
+# converted dictionary to pandas data frame, so we can easily read the json
 def reformat_data():
+    """
+    [ADD DOCUMENTATION HERE]
+    :return:
+    """
     eng_to_chars_data = pd.read_json(ENG_TO_CHARS_DIRECTORY)
 
     # add a new column to the data frame and switched column ordering
@@ -30,6 +34,12 @@ def reformat_data():
 # encodes the data and labels from strings to randomly assigned numbers so they can be tensorized
 # then convert data and labels to tensors
 def preprocess_data(data):
+    """
+    [ADD DOCUMENTATION HERE]
+    [INCLUDE SIGNATURE ON FUNCTION]
+    :param data:
+    :return:
+    """
     encoder = preprocessing.LabelEncoder()
     encoded_data = encoder.fit_transform(data["English"])
     encoded_label = encoder.fit_transform(data["Kanji"])
@@ -41,6 +51,13 @@ def preprocess_data(data):
 # model is a list of np vectors
 
 def run_model(word, model):
+    """
+    [ADD DOCUMENTATION HERE]
+    [INCLUDE SIGNATURE ON FUNCTION]
+    :param word:
+    :param model:
+    :return:
+    """
     # throw word in model to see the radical vector
     radical_vect = []
     return radical_vect
