@@ -5,6 +5,7 @@ import utils
 import pandas as pd
 from sklearn import preprocessing
 
+
 def dict_to_tensors(dict):
     """
     Converts the dict of English words to radicals into tensors that can be used by the network
@@ -22,9 +23,9 @@ def dict_to_tensors(dict):
     rad_tensor = torch.tensor(encoded_rad)
     return eng_tensor, rad_tensor
 
-# model is a list of np vectors
 
-def run_model(word, model):
+# model is a list of np vectors
+def predict(word, model):
     """
     [ADD DOCUMENTATION HERE]
     [INCLUDE SIGNATURE ON FUNCTION]
@@ -37,7 +38,7 @@ def run_model(word, model):
     return radical_vect
 
 
-def train_model(eng_to_rads):
+def train_model(eng_tensor: torch.Tensor, rad_tensor: torch.Tensor):
     # use the english to radicals dictionary to train the model
     model = '''Add later'''
     # Dev note: Might recommend building a class-style torch feedforward model
