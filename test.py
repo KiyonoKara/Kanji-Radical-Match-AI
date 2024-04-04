@@ -3,25 +3,9 @@ import utils
 import random
 
 
-# example from https://docs.python.org/3/library/unittest.html
-class TestStringMethods(unittest.TestCase):
-
-    def test_upper(self):
-        self.assertEqual('foo'.upper(), 'FOO')
-
-    def test_isupper(self):
-        self.assertTrue('FOO'.isupper())
-        self.assertFalse('Foo'.isupper())
-
-    def test_split(self):
-        s = 'hello world'
-        self.assertEqual(s.split(), ['hello', 'world'])
-        # check that s.split fails when the separator is not a string
-        with self.assertRaises(TypeError):
-            s.split(2)
-
+class TestSuite(unittest.TestCase):
     def test_eng_to_rads(self):
-        # test the create_eng_to_rads function
+        # Test the create_eng_to_rads function
         eng_to_char = {
             "hello": ["h", "e", "l", "l", "o"],
             "world": ["w", "o", "r", "l", "d"]
@@ -41,7 +25,7 @@ class TestStringMethods(unittest.TestCase):
         self.assertEqual(eng_to_rads["hello"], ["rad1", "rad2", "rad3", "rad4"])
 
     def test_eng_to_rads2(self):
-        # test the create_eng_to_rads function
+        # Test the create_eng_to_rads function
         eng_to_char = {
             "hello": ["h", "e", "l", "l", "o"],
             "world": ["w", "o", "r", "l", "d"]
@@ -61,6 +45,7 @@ class TestStringMethods(unittest.TestCase):
         self.assertEqual(eng_to_rads["hello"], ["rad1", "rad8", "rad2", "rad3", "rad4"])
 
     def test_eng_to_rads3(self):
+        # Test eng_to_rads function on actual data
         kanji_to_rad_dict = utils.json_to_dict("./data/kanji_to_radical.json")
         eng_to_kanji_dict = utils.json_to_dict("./data/english_to_kanji.json")
         e2k_keys = list(eng_to_kanji_dict.keys())
