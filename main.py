@@ -5,48 +5,22 @@ import utils
 import pandas as pd
 from sklearn import preprocessing
 
-DATA_DIRECTORY_NAME = "data"
-CHAR_TO_RAD_FILENAME = "kanji_to_radical.json"
-CHAR_TO_RAD_DIRECTORY = f"{DATA_DIRECTORY_NAME}/{CHAR_TO_RAD_FILENAME}"
-ENG_TO_CHARS_FILENAME = "english_to_kanji.json"
-ENG_TO_CHARS_DIRECTORY = f"{DATA_DIRECTORY_NAME}/{ENG_TO_CHARS_FILENAME}"
-
-
-# converted dictionary to pandas data frame, so we can easily read the json
-def reformat_data():
+def dict_to_tensors(dict):
     """
-    [ADD DOCUMENTATION HERE]
+    Converts the dict of English words to radicals into tensors that can be used by the network
     :return:
     """
-    eng_to_chars_data = pd.read_json(ENG_TO_CHARS_DIRECTORY)
+    # creates pandas dataframe of dict to convert it to a format that can be made into a tensor
+    dataframe = pd.DataFrame(dict.items(), columns=["English", "Radical"])
+    dataframe = dataframe.explode("Radical")
 
-    # add a new column to the data frame and switched column ordering
-    eng_to_chars_data["English"] = eng_to_chars_data.index
-    eng_to_chars_data.columns = ["Kanji", "English"]
-    eng_to_chars_data = eng_to_chars_data[["English", "Kanji"]]
-
-    # ensure the kanji column only contains one character, the english column will contain duplicate values
-    if eng_to_chars_data["Kanji"].apply(len).max() > 1:
-        eng_to_chars_data = eng_to_chars_data.explode("Kanji")
-    return eng_to_chars_data
-
-
-# encodes the data and labels from strings to randomly assigned numbers so they can be tensorized
-# then convert data and labels to tensors
-def preprocess_data(data):
-    """
-    [ADD DOCUMENTATION HERE]
-    [INCLUDE SIGNATURE ON FUNCTION]
-    :param data:
-    :return:
-    """
+    # encodes and creates tensors of the input and output
     encoder = preprocessing.LabelEncoder()
-    encoded_data = encoder.fit_transform(data["English"])
-    encoded_label = encoder.fit_transform(data["Kanji"])
-    data_tensor = torch.tensor(encoded_data)
-    label_tensor = torch.tensor(encoded_label)
-    return data_tensor, label_tensor
-
+    encoded_eng = encoder.fit_transform(dataframe["English"])
+    encoded_rad = encoder.fit_transform(dataframe["Radical"])
+    eng_tensor = torch.tensor(encoded_eng)
+    rad_tensor = torch.tensor(encoded_rad)
+    return eng_tensor, rad_tensor
 
 # model is a list of np vectors
 
