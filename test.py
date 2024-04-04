@@ -1,10 +1,11 @@
 import unittest
+import utils
+import random
 
-from main import create_eng_to_rads
 
 # example from https://docs.python.org/3/library/unittest.html
 class TestStringMethods(unittest.TestCase):
-    
+
     def test_upper(self):
         self.assertEqual('foo'.upper(), 'FOO')
 
@@ -36,7 +37,7 @@ class TestStringMethods(unittest.TestCase):
             "d": ["rad7"]
         }
 
-        eng_to_rads = create_eng_to_rads(char_to_rad, eng_to_char)
+        eng_to_rads = utils.create_eng_to_rads(char_to_rad, eng_to_char)
         self.assertEqual(eng_to_rads["hello"], ["rad1", "rad2", "rad3", "rad4"])
 
     def test_eng_to_rads2(self):
@@ -56,8 +57,18 @@ class TestStringMethods(unittest.TestCase):
             "d": ["rad7"]
         }
 
-        eng_to_rads = create_eng_to_rads(char_to_rad, eng_to_char)
+        eng_to_rads = utils.create_eng_to_rads(char_to_rad, eng_to_char)
         self.assertEqual(eng_to_rads["hello"], ["rad1", "rad8", "rad2", "rad3", "rad4"])
+
+    def test_eng_to_rads3(self):
+        kanji_to_rad_dict = utils.json_to_dict("./data/kanji_to_radical.json")
+        eng_to_kanji_dict = utils.json_to_dict("./data/english_to_kanji.json")
+        e2k_keys = list(eng_to_kanji_dict.keys())
+        e2k_sampled_keys = random.sample(e2k_keys, 10)
+        e2k_sampled_dict = {key: eng_to_kanji_dict[key] for key in e2k_sampled_keys}
+
+        eng_to_radicals = utils.create_eng_to_rads(kanji_to_rad_dict, e2k_sampled_dict)
+        self.assertTrue(len(eng_to_radicals) == len(e2k_sampled_dict))
 
 if __name__ == '__main__':
     unittest.main()
