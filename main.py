@@ -2,12 +2,36 @@ import json
 import numpy as np
 import torch
 import utils
+import pandas as pd
+from sklearn import preprocessing
 
 DATA_DIRECTORY_NAME = "data"
-CHAR_TO_RAD_FILENAME = "char_to_rad.json"
+CHAR_TO_RAD_FILENAME = "kanji_to_radical.json"
 CHAR_TO_RAD_DIRECTORY = f"{DATA_DIRECTORY_NAME}/{CHAR_TO_RAD_FILENAME}"
-ENG_TO_CHARS_FILENAME = "eng_to_chars.json"
+ENG_TO_CHARS_FILENAME = "english_to_kanji.json"
 ENG_TO_CHARS_DIRECTORY = f"{DATA_DIRECTORY_NAME}/{ENG_TO_CHARS_FILENAME}"
+
+def reformat_data():
+    eng_to_chars_data = pd.read_json(ENG_TO_CHARS_DIRECTORY)
+
+    # add a new column to the data
+    eng_to_chars_data["English"] = eng_to_chars_data.index
+    eng_to_chars_data.columns = ["Kanji", "English"]
+    eng_to_chars_data = eng_to_chars_data[["English", "Kanji"]]
+
+    # ensure the kanji column only contains one character, the english column will contain duplicate values
+    if eng_to_chars_data["Kanji"].apply(len).max() > 1:
+        eng_to_chars_data = eng_to_chars_data.explode("Kanji")
+    return eng_to_chars_data
+
+# encodes the data and labels from strings to randomly assigned numbers
+def preprocess_data(data):
+    encoder = preprocessing.LabelEncoder()
+    encoded_data = encoder.fit_transform(data["English"])
+    encoded_label = encoder.fit_transform(data["Kanji"])
+    data_tensor = torch.tensor(encoded_data)
+    label_tensor = torch.tensor(encoded_label)
+    return data_tensor, label_tensor
 
 # model is a list of np vectors
 
@@ -18,7 +42,7 @@ def run_model(word, model):
 
 def train_model(eng_to_rads):
     # use the english to radicals dictionary to train the model
-    model = []
+
     return model
 
 def train_word(word_vec, true_lbl):
@@ -54,6 +78,9 @@ def load_eng_to_rads():
     return eng_to_rads
 
 def main():
+    data = reformat_data()
+    print(data["English"].nunique())
+    print(data.describe())
     return
     # put in whatever you want to here for debugging locally
 
