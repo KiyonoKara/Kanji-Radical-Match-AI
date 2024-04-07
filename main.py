@@ -1,27 +1,6 @@
-import json
-import numpy as np
 import torch
-import utils
-import pandas as pd
-from sklearn import preprocessing
 
 
-def dict_to_tensors(dict):
-    """
-    Converts the dict of English words to radicals into tensors that can be used by the network
-    :return:
-    """
-    # creates pandas dataframe of dict to convert it to a format that can be made into a tensor
-    dataframe = pd.DataFrame(dict.items(), columns=["English", "Radical"])
-    dataframe = dataframe.explode("Radical")
-
-    # encodes and creates tensors of the input and output
-    encoder = preprocessing.LabelEncoder()
-    encoded_eng = encoder.fit_transform(dataframe["English"])
-    encoded_rad = encoder.fit_transform(dataframe["Radical"])
-    eng_tensor = torch.tensor(encoded_eng)
-    rad_tensor = torch.tensor(encoded_rad)
-    return eng_tensor, rad_tensor
 
 
 # model is a list of np vectors
