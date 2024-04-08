@@ -30,26 +30,15 @@ def dict_to_tensors(dict):
     Converts the dict of English words to radicals into tensors that can be used by the network
     :return:
     """
-    # creates pandas dataframe of dict to convert it to a format that can be made into a tensor
-    dataframe = pd.DataFrame(dict.keys(), columns=["English"])
-    # print(dataframe)
-    # dataframe = dataframe.explode("Radical")
-    # print(dataframe)
-    
-    eng_vocab = list(set(dict.keys()))
-    
     # encodes and creates tensors of the input and output
     encoder_eng = preprocessing.LabelBinarizer()
     encoder_rad = preprocessing.MultiLabelBinarizer()
     encoded_eng = encoder_eng.fit_transform(list(dict.keys()))
-    print(encoded_eng)
-    print(encoder_eng.classes_)
     encoded_rad = encoder_rad.fit_transform(dict.values())
-    print(encoded_rad)
-    print(encoder_rad.classes_)
-    eng_tensor = torch.tensor(encoded_eng)
-    rad_tensor = torch.tensor(encoded_rad)
-    return eng_tensor, rad_tensor
+    eng_tensor = torch.tensor(encoded_eng, dtype=torch.float32)
+    rad_tensor = torch.tensor(encoded_rad, dtype=torch.float32)
+    assert eng_tensor.size(0) == rad_tensor.size(0)
+    return eng_tensor, rad_tensor, encoder_eng.classes_, encoder_rad.classes_
 
 def create_eng_to_rads(kanji_to_rads, eng_to_kanji) -> dict[str, list[str]]:
     """
@@ -122,8 +111,7 @@ class KanjiFFNN(nn.Module):
         super(KanjiFFNN, self).__init__()
         # Hidden layer
         self.hid1 = nn.Linear(eng_vocab_size, nodes)
-        # Output layer
-        self.out1 = nn.Linear(nodes, radical_vocab_size)
+        self.hid2 = nn.Linear(nodes, radical_vocab_size)
 
     def forward(self, x):
         """
@@ -131,12 +119,19 @@ class KanjiFFNN(nn.Module):
         :param x: Data
         :return:
         """
+        # print("Forward start!")
         # Pass input x to hidden layer
+        # print(x)
         x = self.hid1(x)
         # Apply ReLU activation function to output of first layer
+        # print(x)
         x = F.relu(x)
+        # Apply second hiddenl ayer
+        # print(x)
+        x = self.hid2(x)
         # Pass the output from the previous layer to the output layer
-        x = self.out1(x)
-        # Apply sigmoid to output
+        # print(x)
         x = F.sigmoid(x)
+        # print(x)
+        # print("Forward end!")
         return x
