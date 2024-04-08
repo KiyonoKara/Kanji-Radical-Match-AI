@@ -1,5 +1,6 @@
 import json
 import torch
+import numpy as np
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
@@ -30,13 +31,22 @@ def dict_to_tensors(dict):
     :return:
     """
     # creates pandas dataframe of dict to convert it to a format that can be made into a tensor
-    dataframe = pd.DataFrame(dict.items(), columns=["English", "Radical"])
-    dataframe = dataframe.explode("Radical")
-
+    dataframe = pd.DataFrame(dict.keys(), columns=["English"])
+    # print(dataframe)
+    # dataframe = dataframe.explode("Radical")
+    # print(dataframe)
+    
+    eng_vocab = list(set(dict.keys()))
+    
     # encodes and creates tensors of the input and output
-    encoder = preprocessing.LabelEncoder()
-    encoded_eng = encoder.fit_transform(dataframe["English"])
-    encoded_rad = encoder.fit_transform(dataframe["Radical"])
+    encoder_eng = preprocessing.LabelBinarizer()
+    encoder_rad = preprocessing.MultiLabelBinarizer()
+    encoded_eng = encoder_eng.fit_transform(list(dict.keys()))
+    print(encoded_eng)
+    print(encoder_eng.classes_)
+    encoded_rad = encoder_rad.fit_transform(dict.values())
+    print(encoded_rad)
+    print(encoder_rad.classes_)
     eng_tensor = torch.tensor(encoded_eng)
     rad_tensor = torch.tensor(encoded_rad)
     return eng_tensor, rad_tensor
