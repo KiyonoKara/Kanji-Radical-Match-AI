@@ -1,10 +1,9 @@
 import json
+
 import torch
-import numpy as np
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-import pandas as pd
 from sklearn import preprocessing
 
 DATA_DIRECTORY_NAME = "data"
@@ -24,6 +23,7 @@ def get_tensor_from_word(word: str, eng_tens: torch.Tensor, eng_vocab: list[str]
             return tens
     raise RuntimeError("Corresponding tensor for word was not found!")
 
+
 def json_to_dict(json_file: str) -> dict:
     """
     Load json file and return it as a dict
@@ -35,7 +35,8 @@ def json_to_dict(json_file: str) -> dict:
     f.close()
     return dict(data)
 
-def dict_to_tensors(dict):
+
+def dict_to_tensors(eng_to_rad: dict):
     """
     Converts the dict of English words to radicals into tensors that can be used by the network
     :return:
@@ -43,12 +44,13 @@ def dict_to_tensors(dict):
     # encodes and creates tensors of the input and output
     encoder_eng = preprocessing.LabelBinarizer()
     encoder_rad = preprocessing.MultiLabelBinarizer()
-    encoded_eng = encoder_eng.fit_transform(list(dict.keys()))
-    encoded_rad = encoder_rad.fit_transform(dict.values())
+    encoded_eng = encoder_eng.fit_transform(list(eng_to_rad.keys()))
+    encoded_rad = encoder_rad.fit_transform(eng_to_rad.values())
     eng_tensor = torch.tensor(encoded_eng, dtype=torch.float32)
     rad_tensor = torch.tensor(encoded_rad, dtype=torch.float32)
     assert eng_tensor.size(0) == rad_tensor.size(0)
     return eng_tensor, rad_tensor, encoder_eng.classes_, encoder_rad.classes_
+
 
 def create_eng_to_rads(kanji_to_rads, eng_to_kanji) -> dict[str, list[str]]:
     """
@@ -84,36 +86,43 @@ def load_eng_to_rads() -> dict[str, list[str]]:
 
 
 def train_model(model: nn.Module,
-                eng_tensor: torch.Tensor,
-                rad_tensor: torch.Tensor,
+                eng_tensors: torch.Tensor,
+                rad_tensors: torch.Tensor,
                 optimizer: optim.Optimizer,
                 criterion=nn.MSELoss(),
                 epochs=100,
+                scheduler: optim.lr_scheduler.LRScheduler = None,
                 verbose=False):
     """
     Trains the model based on all of its information and parameters
     :param model:
-    :param eng_tensor:
-    :param rad_tensor:
+    :param eng_tensors:
+    :param rad_tensors:
     :param optimizer:
     :param criterion:
     :param epochs:
+    :param scheduler:
     :param verbose: Whether to print the loss during training
     :return:
     """
-
-    for i in range(0, epochs):
-        for eng, rad in zip(eng_tensor, rad_tensor):
+    loss = 0
+    for epoch in range(0, epochs):
+        for eng, rad in zip(eng_tensors, rad_tensors):
             # Zero the gradient buffers
             optimizer.zero_grad()
+            # Self as the model
             output = model(eng)
-            # Large
-            loss = criterion(rad, output)
+            loss = criterion(output, rad)
             loss.backward()
             # Update
             optimizer.step()
-            if verbose:
-                print("Epoch {: >8} Loss: {}".format(i, loss.data.numpy()))
+        if scheduler is not None:
+            scheduler.step()
+        if epoch % 1000 == 0 or epoch < 100:
+            print_verbose(
+                "Epoch {: >8} Loss: {}".format(epoch + 1, loss.data.numpy()),
+                verbose=verbose
+            )
 
 
 class KanjiFFNN(nn.Module):
@@ -136,7 +145,7 @@ class KanjiFFNN(nn.Module):
         # Apply ReLU activation function to output of first layer
         # print(x)
         x = F.relu(x)
-        # Apply second hiddenl ayer
+        # Apply second hidden layer
         # print(x)
         x = self.hid2(x)
         # Pass the output from the previous layer to the output layer
@@ -145,3 +154,35 @@ class KanjiFFNN(nn.Module):
         # print(x)
         # print("Forward end!")
         return x
+
+    def train_fit(self,
+                  eng_tensors: torch.Tensor,
+                  rad_tensors: torch.Tensor,
+                  optimizer: optim.Optimizer,
+                  criterion=nn.MSELoss(),
+                  epochs=100,
+                  scheduler: optim.lr_scheduler.LRScheduler = None,
+                  verbose=False):
+        """
+        Forwards itself to train_model function
+        :param eng_tensors:
+        :param rad_tensors:
+        :param optimizer:
+        :param criterion:
+        :param epochs:
+        :param scheduler:
+        :param verbose:
+        :return:
+        """
+        return train_model(self, eng_tensors, rad_tensors, optimizer, criterion, epochs, scheduler, verbose)
+
+
+def print_verbose(*values, verbose):
+    """
+    Prints verbose information based on data provided
+    :param values:
+    :param verbose:
+    :return:
+    """
+    if verbose:
+        print(*values)
