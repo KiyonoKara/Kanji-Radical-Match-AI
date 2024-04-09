@@ -61,16 +61,17 @@ def create_eng_to_rads(kanji_to_rads, eng_to_kanji) -> dict[str, list[str]]:
     :return: dict of English words to radicals
     """
 
-    eng_to_rads = dict()
-    for eng_word in eng_to_kanji:
-        # Create new dict entry for English word
-        eng_to_rads[eng_word] = []
-        for kanji in eng_to_kanji[eng_word]:
-            # Add unique radicals to English word entry
-            if kanji in kanji_to_rads:
-                for rad in kanji_to_rads[kanji]:
-                    if rad not in eng_to_rads[eng_word]:
-                        eng_to_rads[eng_word].append(rad)
+    eng_to_rads = {}
+
+    for eng_word, kanji_list in eng_to_kanji.items():
+        # Create an empty set to store unique radicals for the current English word
+        radicals_set = set()
+        for kanji in kanji_list:
+            # Get the list of radicals for the current kanji from the kanji_to_rads dictionary
+            # If the kanji is not present in the dictionary, it returns an empty list
+            radicals_set.update(kanji_to_rads.get(kanji, []))
+        # Convert the radicals_set to a list and store it in the eng_to_rads dictionary
+        eng_to_rads[eng_word] = list(radicals_set)
     return eng_to_rads
 
 
