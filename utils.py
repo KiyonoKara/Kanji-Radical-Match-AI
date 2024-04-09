@@ -14,6 +14,16 @@ ENG_TO_CHARS_FILENAME = "english_to_kanji.json"
 ENG_TO_CHARS_DIRECTORY = f"{DATA_DIRECTORY_NAME}/{ENG_TO_CHARS_FILENAME}"
 
 
+def get_tensor_from_word(word: str, eng_tens: torch.Tensor, eng_vocab: list[str]):
+    word_to_idx_dict = {vocab: idx for idx, vocab in enumerate(eng_vocab)}
+    if word not in word_to_idx_dict:
+        raise RuntimeError("Word is not in vocabulary!")
+    idx = word_to_idx_dict[word]
+    for tens in eng_tens:
+        if tens[idx] == 1.:
+            return tens
+    raise RuntimeError("Corresponding tensor for word was not found!")
+
 def json_to_dict(json_file: str) -> dict:
     """
     Load json file and return it as a dict
