@@ -4,7 +4,9 @@ Generate (and match) radicals of Japanese (and Chinese) characters that most lik
 # Data & References
 - EDRDG, RADFILE/KRADFILE, https://www.edrdg.org/krad/kradinf.html
 - rad2thought, https://github.com/tacchinotacchi/rad2thought
-  - Pre-processed data from kanji2radical.json
+  - Pre-processed data from kanji2radical.json (processed and obtained from EDRDG)
+- kanjivg-radical, https://github.com/yagays/kanjivg-radical
+  - Pre-processed data from kanji2radical.json (processed and obtained from EDRDG)
 - kanji-data, https://github.com/davidluzgouveia/kanji-data
   - Reference for kanji data processing from EDRDG
   - Pre-processed dictionary data from the kanji JSON files
