@@ -8,3 +8,5 @@ Generate (and match) radicals of Japanese (and Chinese) characters that most lik
 - kanji-data, https://github.com/davidluzgouveia/kanji-data
   - English-Kanji data reference
   - Reference for pre-processing the dictionary data from the kanji JSON files and KRADFILE
+- jmdict-simplified, https://github.com/scriptin/jmdict-simplified
+  - Preprocessed data from EDRDG
