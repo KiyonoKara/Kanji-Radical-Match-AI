@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
+import random
 from sklearn import preprocessing
 
 DATA_DIRECTORY_NAME = "data"
@@ -16,7 +17,9 @@ ENG_TO_CHARS_DIRECTORY = f"{DATA_DIRECTORY_NAME}/{ENG_TO_CHARS_FILENAME}"
 def get_tensor_from_word(word: str, eng_tens: torch.Tensor, eng_vocab: list[str]):
     word_to_idx_dict = {vocab: idx for idx, vocab in enumerate(eng_vocab)}
     if word not in word_to_idx_dict:
-        raise RuntimeError("Word is not in vocabulary!")
+        # If it doesn't exist, get a random encoding
+        word = random.choice(eng_vocab)
+        print(f"Word not found, using \'{word}\' instead")
     idx = word_to_idx_dict[word]
     for tens in eng_tens:
         if tens[idx] == 1.:
