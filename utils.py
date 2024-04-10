@@ -127,11 +127,13 @@ def train_model(model: nn.Module,
 
 
 class KanjiFFNN(nn.Module):
-    def __init__(self, eng_vocab_size: int, radical_vocab_size: int, nodes: int):
+    def __init__(self, eng_vocab_size: int, radical_vocab_size: int):
         super(KanjiFFNN, self).__init__()
         # Hidden layer
-        self.hid1 = nn.Linear(eng_vocab_size, nodes)
-        self.hid2 = nn.Linear(nodes, radical_vocab_size)
+        self.input = nn.Linear(eng_vocab_size, 200)
+        self.hid1 = nn.Linear(200, 300)
+        self.hid2 = nn.Linear(300, 200)
+        self.output = nn.Linear(200, radical_vocab_size)
 
     def forward(self, x):
         """
@@ -139,21 +141,10 @@ class KanjiFFNN(nn.Module):
         :param x: Data
         :return:
         """
-        # print("Forward start!")
-        # Pass input x to hidden layer
-        # print(x)
-        x = self.hid1(x)
-        # Apply ReLU activation function to output of first layer
-        # print(x)
-        x = F.relu(x)
-        # Apply second hidden layer
-        # print(x)
-        x = self.hid2(x)
-        # Pass the output from the previous layer to the output layer
-        # print(x)
-        x = F.sigmoid(x)
-        # print(x)
-        # print("Forward end!")
+        x = F.relu(self.input(x))
+        x = F.relu(self.hid1(x))
+        x = F.relu(self.hid2(x))
+        x = F.sigmoid(self.output(x))
         return x
 
     def train_fit(self,
