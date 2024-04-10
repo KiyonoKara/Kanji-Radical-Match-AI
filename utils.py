@@ -130,10 +130,10 @@ class KanjiFFNN(nn.Module):
     def __init__(self, eng_vocab_size: int, radical_vocab_size: int):
         super(KanjiFFNN, self).__init__()
         # Hidden layer
-        self.input = nn.Linear(eng_vocab_size, 200)
-        self.hid1 = nn.Linear(200, 300)
-        self.hid2 = nn.Linear(300, 200)
-        self.output = nn.Linear(200, radical_vocab_size)
+        self.input = nn.Linear(eng_vocab_size, 600)
+        self.hid1 = nn.Linear(600, 400)
+        self.hid2 = nn.Linear(400, 300)
+        self.output = nn.Linear(300, radical_vocab_size)
 
     def forward(self, x):
         """
