@@ -1,41 +1,59 @@
+import matplotlib.pyplot as plt
+import matplotlib.font_manager as fm
 import torch
+import utils as u
+from utils import KanjiFFNN
+
+TOP_TAKE = 10
+eng_to_rads = dict(list(u.load_eng_to_rads().items()))
+eng_tens, rad_tens, eng_vocab, rad_vocab = u.dict_to_tensors(eng_to_rads)
+e2r_model = KanjiFFNN(eng_tens.size(1), rad_tens.size(1))
+QUIT_MSG = '!quit'
 
 
+def load_e2r_model():
+    e2r_model.load_state_dict(torch.load("./models/model_state_dict.pt"))
 
 
-# model is a list of np vectors
-def predict(word, model):
-    """
-    [ADD DOCUMENTATION HERE]
-    [INCLUDE SIGNATURE ON FUNCTION]
-    :param word:
-    :param model:
-    :return:
-    """
-    # throw word in model to see the radical vector
-    radical_vect = []
-    return radical_vect
+def radical_distribution_generator(input_word):
+    input_tensor = u.get_tensor_from_word(input_word, eng_tens, eng_vocab)
 
+    pred_tensor = e2r_model(input_tensor)
 
-def train_model(eng_tensor: torch.Tensor, rad_tensor: torch.Tensor):
-    # use the english to radicals dictionary to train the model
-    model = '''Add later'''
-    # Dev note: Might recommend building a class-style torch feedforward model
-    return model
+    output_probs = pred_tensor.detach().numpy().squeeze()
+    radical_probs = [(radical, prob) for radical, prob in zip(rad_vocab, output_probs)]
+    sorted_radical_probs = sorted(radical_probs, key=lambda x: x[1], reverse=True)
 
+    radicals, probabilities = zip(*sorted_radical_probs)
 
-def train_word(word_vec, true_lbl):
-    # train a single word
-    return
+    radicals_top = list(radicals[:TOP_TAKE])
+    probabilities_top = list(probabilities[:TOP_TAKE])
 
+    fig, axs = plt.subplots()
+    axs.bar(range(TOP_TAKE), probabilities_top)
+    fprop = fm.FontProperties(fname='NotoSansCJKtc-Regular.otf')
+    axs.set_xticks(range(TOP_TAKE), radicals_top, fontproperties=fprop)
+    axs.set_xlabel('Radicals')
+    axs.set_ylabel('Probabilities')
+    axs.set_title(f'Top {TOP_TAKE} Radical Most Likely associated with \"{input_word}\"')
+    plt.ylim(0.0, 1.0)
 
-def save_model(model, filename):
-    torch.save(model, filename)
+    plt.show()
 
 
 def main():
-    return
-    # put in whatever you want to here for debugging locally
+    load_e2r_model()
+
+    print('English to Radical Matching\n'
+          '*.+:.☆　英単語→(日中)部首　☆.:+.*\n'
+          f'(Type \'{QUIT_MSG}\' to quit anytime)\n')
+
+    while True:
+        input_text = input("Enter your input word or phrase: ").strip()
+        if input_text == QUIT_MSG:
+            exit()
+
+        radical_distribution_generator(input_text)
 
 
 if __name__ == "__main__":
