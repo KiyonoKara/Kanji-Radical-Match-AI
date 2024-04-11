@@ -133,11 +133,10 @@ def train_model(model: nn.Module,
 class KanjiFFNN(nn.Module):
     def __init__(self, eng_vocab_size: int, radical_vocab_size: int):
         super(KanjiFFNN, self).__init__()
-        # Hidden layer
         self.input = nn.Linear(eng_vocab_size, radical_vocab_size)
-        self.hid1 = nn.Linear(radical_vocab_size, 300)
-        # self.hid2 = nn.Linear(400, 300)
-        self.output = nn.Linear(300, radical_vocab_size)
+        # Hidden layer
+        self.hid1 = nn.Linear(radical_vocab_size, radical_vocab_size)
+        self.output = nn.Linear(radical_vocab_size, radical_vocab_size)
 
     def forward(self, x):
         """
@@ -147,7 +146,6 @@ class KanjiFFNN(nn.Module):
         """
         x = F.relu(self.input(x))
         x = F.relu(self.hid1(x))
-        # x = F.relu(self.hid2(x))
         x = F.sigmoid(self.output(x))
         return x
 
