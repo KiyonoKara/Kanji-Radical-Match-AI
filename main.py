@@ -53,7 +53,7 @@ def main():
         if input_text == QUIT_MSG:
             exit()
 
-        radical_distribution_generator(input_text)
+        radical_distribution_generator(input_text.strip())
 
 
 if __name__ == "__main__":
