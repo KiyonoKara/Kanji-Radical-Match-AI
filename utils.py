@@ -10,7 +10,7 @@ from sklearn import preprocessing
 DATA_DIRECTORY_NAME = "data"
 CHAR_TO_RAD_FILENAME = "kanji_to_radical.json"
 CHAR_TO_RAD_DIRECTORY = f"{DATA_DIRECTORY_NAME}/{CHAR_TO_RAD_FILENAME}"
-ENG_TO_CHARS_FILENAME = "english_to_kanji.json"
+ENG_TO_CHARS_FILENAME = "english_to_kanji_v2.json"
 ENG_TO_CHARS_DIRECTORY = f"{DATA_DIRECTORY_NAME}/{ENG_TO_CHARS_FILENAME}"
 
 
@@ -134,9 +134,9 @@ class KanjiFFNN(nn.Module):
     def __init__(self, eng_vocab_size: int, radical_vocab_size: int):
         super(KanjiFFNN, self).__init__()
         # Hidden layer
-        self.input = nn.Linear(eng_vocab_size, 600)
-        self.hid1 = nn.Linear(600, 400)
-        self.hid2 = nn.Linear(400, 300)
+        self.input = nn.Linear(eng_vocab_size, radical_vocab_size)
+        self.hid1 = nn.Linear(radical_vocab_size, 300)
+        # self.hid2 = nn.Linear(400, 300)
         self.output = nn.Linear(300, radical_vocab_size)
 
     def forward(self, x):
@@ -147,7 +147,7 @@ class KanjiFFNN(nn.Module):
         """
         x = F.relu(self.input(x))
         x = F.relu(self.hid1(x))
-        x = F.relu(self.hid2(x))
+        # x = F.relu(self.hid2(x))
         x = F.sigmoid(self.output(x))
         return x
 
