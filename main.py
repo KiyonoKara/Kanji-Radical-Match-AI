@@ -16,7 +16,7 @@ def load_e2r_model():
 
 
 def radical_distribution_generator(input_word):
-    input_tensor = u.get_tensor_from_word(input_word, eng_tens, eng_vocab)
+    input_tensor = u.get_tensor_from_word(input_word, eng_tens, eng_vocab, verbose=True)
 
     pred_tensor = e2r_model(input_tensor)
 
