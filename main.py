@@ -35,7 +35,7 @@ def radical_distribution_generator(input_word):
     axs.set_xticks(range(TOP_TAKE), radicals_top, fontproperties=fprop)
     axs.set_xlabel('Radicals')
     axs.set_ylabel('Probabilities')
-    axs.set_title(f'Top {TOP_TAKE} Radical Most Likely associated with \"{input_word}\"')
+    axs.set_title(f'Top {TOP_TAKE} Radicals Most Likely Associated With \"{input_word}\"')
     plt.ylim(0.0, 1.0)
 
     plt.show()
