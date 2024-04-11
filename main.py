@@ -1,13 +1,59 @@
-import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
+import matplotlib.pyplot as plt
 import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import torch.optim as optim
 import utils as u
-from utils import KanjiFFNN
+
+
+class KanjiFFNN_V1(nn.Module):
+    def __init__(self, eng_vocab_size: int, radical_vocab_size: int):
+        super(KanjiFFNN_V1, self).__init__()
+        # Hidden layer
+        self.input = nn.Linear(eng_vocab_size, 600)
+        self.hid1 = nn.Linear(600, 400)
+        self.hid2 = nn.Linear(400, 300)
+        self.output = nn.Linear(300, radical_vocab_size)
+
+    def forward(self, x):
+        """
+        Forward propagation of the model
+        :param x: Data
+        :return:
+        """
+        x = F.relu(self.input(x))
+        x = F.relu(self.hid1(x))
+        x = F.relu(self.hid2(x))
+        x = F.sigmoid(self.output(x))
+        return x
+
+    def train_fit(self,
+                  eng_tensors: torch.Tensor,
+                  rad_tensors: torch.Tensor,
+                  optimizer: optim.Optimizer,
+                  criterion=nn.MSELoss(),
+                  epochs=100,
+                  scheduler: optim.lr_scheduler.LRScheduler = None,
+                  verbose=False):
+        """
+        Forwards itself to train_model function
+        :param eng_tensors:
+        :param rad_tensors:
+        :param optimizer:
+        :param criterion:
+        :param epochs:
+        :param scheduler:
+        :param verbose:
+        :return:
+        """
+        return u.train_model(self, eng_tensors, rad_tensors, optimizer, criterion, epochs, scheduler, verbose)
+
 
 TOP_TAKE = 10
 eng_to_rads = dict(list(u.load_eng_to_rads().items()))
 eng_tens, rad_tens, eng_vocab, rad_vocab = u.dict_to_tensors(eng_to_rads)
-e2r_model = KanjiFFNN(eng_tens.size(1), rad_tens.size(1))
+e2r_model = KanjiFFNN_V1(eng_tens.size(1), rad_tens.size(1))
 QUIT_MSG = '!quit'
 
 
