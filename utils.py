@@ -110,22 +110,31 @@ def train_model(model: nn.Module,
     :param verbose: Whether to print the loss during training
     :return:
     """
-    loss = 0
+    total = rad_tensors.size(0)
     for epoch in range(0, epochs):
+        loss = 0
+        correct = 0.0
         for eng, rad in zip(eng_tensors, rad_tensors):
             # Zero the gradient buffers
             optimizer.zero_grad()
             # Self as the model
             output = model(eng)
             loss = criterion(output, rad)
+            # Backward pass
             loss.backward()
             # Update
             optimizer.step()
+
+            _, predicted = torch.max(output.data, 0)
+            correct += (predicted == rad).sum().item()
+
+        accuracy = correct / total
         if scheduler is not None:
             scheduler.step()
         if epoch % 1000 == 0 or epoch < 100:
             print_verbose(
                 "Epoch {: >8} Loss: {}".format(epoch + 1, loss.data.numpy()),
+                "Accuracy: {}".format(accuracy),
                 verbose=verbose
             )
 
