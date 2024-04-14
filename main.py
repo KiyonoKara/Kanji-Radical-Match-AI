@@ -5,6 +5,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import utils as u
+from utils import KanjiFFNN
 
 
 class KanjiFFNN_V1(nn.Module):
