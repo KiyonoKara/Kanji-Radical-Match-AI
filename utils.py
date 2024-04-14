@@ -95,7 +95,7 @@ def train_model(model: nn.Module,
                 rad_tensors: torch.Tensor,
                 optimizer: optim.Optimizer,
                 criterion=nn.MSELoss(),
-                epochs=100,
+                epochs=5,
                 scheduler: optim.lr_scheduler.LRScheduler = None,
                 verbose=False):
     """
@@ -131,12 +131,11 @@ def train_model(model: nn.Module,
         accuracy = correct / total
         if scheduler is not None:
             scheduler.step()
-        if epoch % 1000 == 0 or epoch < 100:
-            print_verbose(
-                "Epoch {: >8} Loss: {}".format(epoch + 1, loss.data.numpy()),
-                "Accuracy: {}".format(accuracy),
-                verbose=verbose
-            )
+        print_verbose(
+            "Epoch {: >8} Loss: {}".format(epoch + 1, loss.data.numpy()),
+            "Accuracy: {}".format(accuracy),
+            verbose=verbose
+        )
 
 
 class KanjiFFNN(nn.Module):
