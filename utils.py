@@ -126,14 +126,13 @@ def train_model(model: nn.Module,
             optimizer.step()
 
             _, predicted = torch.max(output.data, 0)
-            # predicted = (output > 0.5).float()
             correct += (predicted == rad).sum().item()
 
         accuracy = correct / total
         if scheduler is not None:
             scheduler.step()
         print_verbose(
-            "Epoch: {}  Loss: {}  Accuracy: {}".format(epoch + 1, loss.data.numpy(), accuracy),
+            "Epoch: {}  Loss: {}  Accuracy: {}%".format(epoch + 1, loss.data.numpy(), accuracy),
             verbose=verbose
         )
 
