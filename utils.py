@@ -14,7 +14,7 @@ ENG_TO_CHARS_FILENAME = "english_to_kanji_v3.json"
 ENG_TO_CHARS_DIRECTORY = f"{DATA_DIRECTORY_NAME}/{ENG_TO_CHARS_FILENAME}"
 
 
-def get_tensor_from_word(word: str, eng_tens: torch.Tensor, eng_vocab: list[str], verbose=False):
+def get_tensor_from_word_v1(word: str, eng_tens: torch.Tensor, eng_vocab: list[str], verbose=False):
     word_to_idx_dict = {vocab: idx for idx, vocab in enumerate(eng_vocab)}
     if word not in word_to_idx_dict:
         # If it doesn't exist, get a random encoding
@@ -26,6 +26,25 @@ def get_tensor_from_word(word: str, eng_tens: torch.Tensor, eng_vocab: list[str]
         if tens[idx] == 1.:
             return tens
     raise RuntimeError("Corresponding tensor for word was not found!")
+
+
+def get_tensor_from_word(word: str, eng_tens: torch.Tensor, eng_vocab: list[str], rad_vocab: list[str],
+                         eng_to_rads: dict, verbose=False):
+    word_to_idx_dict = {vocab: idx for idx, vocab in enumerate(eng_vocab)}
+    rad_to_idx = {rad: idx for idx, rad in enumerate(rad_vocab)}
+    if word not in word_to_idx_dict:
+        # If it doesn't exist, get a random encoding
+        word = random.choice(eng_vocab)
+        if verbose:
+            print(f"Word not found, using \'{word}\' instead")
+    idx = word_to_idx_dict[word]
+    word_idx = eng_tens[idx]
+
+    rad_tensor = torch.zeros(len(rad_vocab), dtype=torch.float32)
+    for rad in eng_to_rads[eng_vocab[word_idx]]:
+        rad_tensor[rad_to_idx[rad]] = 1.0
+
+    return rad_tensor
 
 
 def json_to_dict(json_file: str) -> dict:
@@ -40,9 +59,10 @@ def json_to_dict(json_file: str) -> dict:
     return dict(data)
 
 
-def dict_to_tensors(eng_to_rad: dict):
+def dict_to_tensors_v1(eng_to_rad: dict):
     """
     Converts the dict of English words to radicals into tensors that can be used by the network
+    Only for V1 and V2 models
     :return:
     """
     # encodes and creates tensors of the input and output
@@ -54,6 +74,35 @@ def dict_to_tensors(eng_to_rad: dict):
     rad_tensor = torch.tensor(encoded_rad, dtype=torch.float32)
     assert eng_tensor.size(0) == rad_tensor.size(0)
     return eng_tensor, rad_tensor, encoder_eng.classes_, encoder_rad.classes_
+
+
+def dict_to_tensors(eng_to_rad: dict):
+    """
+    Converts the dict of English words to radicals into tensors that can be used by the network
+    :return:
+    """
+    # Create dictionaries to map words and radicals to indices
+    eng_vocab = list(set(eng_to_rad.keys()))
+    # Flatten the list of lists
+    rad_vocab = list(set(sum(eng_to_rad.values(), [])))
+
+    eng_word_to_idx = {word: idx for idx, word in enumerate(eng_vocab)}
+    rad_to_idx = {rad: idx for idx, rad in enumerate(rad_vocab)}
+
+    # Convert English words to indices
+    eng_indices = [eng_word_to_idx[word] for word in eng_to_rad.keys()]
+    eng_tensor = torch.tensor(eng_indices, dtype=torch.long)
+
+    # Convert radicals to multi-hot encoded tensors
+    rad_tensors = []
+    for rad_list in eng_to_rad.values():
+        rad_indices = [rad_to_idx[rad] for rad in rad_list]
+        rad_tensor = torch.zeros(len(rad_vocab), dtype=torch.float32)
+        rad_tensor[rad_indices] = 1.0
+        rad_tensors.append(rad_tensor)
+    rad_tensor = torch.stack(rad_tensors)
+
+    return eng_tensor, rad_tensor, eng_vocab, rad_vocab
 
 
 def create_eng_to_rads(kanji_to_rads, eng_to_kanji) -> dict[str, list[str]]:
@@ -153,9 +202,10 @@ class KanjiFFNN(nn.Module):
         :param x: Data
         :return:
         """
+        x = x.long()
         x = self.embedding(x)
         x = F.relu(self.hid1(x))
-        x = F.sigmoid(self.output(x))
+        x = torch.sigmoid(self.output(x))
         return x
 
     def train_fit(self,
