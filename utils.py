@@ -10,7 +10,7 @@ from sklearn import preprocessing
 DATA_DIRECTORY_NAME = "data"
 CHAR_TO_RAD_FILENAME = "kanji_to_radical.json"
 CHAR_TO_RAD_DIRECTORY = f"{DATA_DIRECTORY_NAME}/{CHAR_TO_RAD_FILENAME}"
-ENG_TO_CHARS_FILENAME = "english_to_kanji.json"
+ENG_TO_CHARS_FILENAME = "english_to_kanji_v3.json"
 ENG_TO_CHARS_DIRECTORY = f"{DATA_DIRECTORY_NAME}/{ENG_TO_CHARS_FILENAME}"
 
 
