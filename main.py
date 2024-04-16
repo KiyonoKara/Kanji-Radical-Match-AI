@@ -52,14 +52,17 @@ class KanjiFFNN_V1(nn.Module):
 
 
 TOP_TAKE = 10
-eng_to_rads = dict(list(u.load_eng_to_rads().items()))
+# eng_to_rads = dict(list(u.load_eng_to_rads().items()))
+eng_to_rads = u.json_to_dict('./data/english_to_radicals.json')
 eng_tens, rad_tens, eng_vocab, rad_vocab = u.dict_to_tensors(eng_to_rads)
-e2r_model = KanjiFFNN_V1(eng_tens.size(1), rad_tens.size(1))
+# e2r_model_v1 = KanjiFFNN_V1(eng_tens.size(1), rad_tens.size(1))
+e2r_model = KanjiFFNN(eng_tens.size(1), rad_tens.size(1))
 QUIT_MSG = '!quit'
 
 
 def load_e2r_model():
-    e2r_model.load_state_dict(torch.load("./models/model_state_dict.pt"))
+    # e2r_model_v1.load_state_dict(torch.load("./models/model_state_dict.pt"))
+    e2r_model.load_state_dict(torch.load("./models/model_v3_state_dict.pt"))
 
 
 def radical_distribution_generator(input_word):
