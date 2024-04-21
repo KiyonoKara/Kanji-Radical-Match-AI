@@ -141,10 +141,8 @@ class KanjiFFNN(nn.Module):
     def __init__(self, eng_vocab_size: int, radical_vocab_size: int):
         super(KanjiFFNN, self).__init__()
         # self.embedding = nn.Embedding(eng_vocab_size, embedding_dim=radical_vocab_size)
-        self.input = nn.Linear(eng_vocab_size, radical_vocab_size)
-        # Hidden layer
-        self.hid1 = nn.Linear(radical_vocab_size, radical_vocab_size)
-        self.output = nn.Linear(radical_vocab_size, radical_vocab_size)
+        self.input = nn.Linear(eng_vocab_size, 300)
+        self.output = nn.Linear(300, radical_vocab_size)
 
     def forward(self, x):
         """
@@ -155,7 +153,6 @@ class KanjiFFNN(nn.Module):
         # x = x.long()
         # x = self.embedding(x)
         x = self.input(x)
-        x = F.relu(self.hid1(x))
         x = torch.sigmoid(self.output(x))
         return x
 
