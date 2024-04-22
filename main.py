@@ -62,7 +62,7 @@ QUIT_MSG = '!quit'
 
 def load_e2r_model():
     # e2r_model_v1.load_state_dict(torch.load("./models/model_state_dict.pt"))
-    e2r_model.load_state_dict(torch.load("./models/model_v3_state_dict.pt"))
+    e2r_model.load_state_dict(torch.load("models/model_v4_state_dict.pt"))
 
 
 def radical_distribution_generator(input_word):
